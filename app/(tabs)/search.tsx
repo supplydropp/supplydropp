@@ -1,66 +1,70 @@
-import {FlatList, Text, View} from 'react-native'
-import {SafeAreaView} from "react-native-safe-area-context";
-import useAppwrite from "@/lib/useAppwrite";
-import {getCategories, getMenu} from "@/lib/appwrite";
-import {useLocalSearchParams} from "expo-router";
-import {useEffect} from "react";
-import CartButton from "@/components/CartButton";
-import cn from "clsx";
-import MenuCard from "@/components/MenuCard";
-import {MenuItem} from "@/type";
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import { useRouter } from "expo-router";
+import useAuthStore from "@/store/auth.store";
+import { databases, appwriteConfig } from "@/lib/appwrite";
+import { Query } from "react-native-appwrite";
 
-import Filter from "@/components/Filter";
-import SearchBar from "@/components/SearchBar";
+export default function Store() {
+  const { user } = useAuthStore();
+  const role = user?.role ?? "guest";
+  const router = useRouter();
 
-const Search = () => {
-    const { category, query } = useLocalSearchParams<{query: string; category: string}>()
+  const [packs, setPacks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const { data, refetch, loading } = useAppwrite({ fn: getMenu, params: { category,  query,  limit: 6, } });
-    const { data: categories } = useAppwrite({ fn: getCategories });
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await databases.listDocuments(
+          appwriteConfig.databaseId,
+          appwriteConfig.packsCollectionId,
+          [
+            Query.equal("type", role),
+            Query.equal("active", true)
+          ]
+        );
+        setPacks(res.documents);
+      } catch (err) {
+        console.error("Failed to load packs:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [role]);
 
-    useEffect(() => {
-        refetch({ category, query, limit: 6})
-    }, [category, query]);
-
+  if (loading) {
     return (
-        <SafeAreaView className="bg-white h-full">
-            <FlatList
-                data={data}
-                renderItem={({ item, index }) => {
-                    const isFirstRightColItem = index % 2 === 0;
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#FE8C00" />
+      </View>
+    );
+  }
 
-                    return (
-                        <View className={cn("flex-1 max-w-[48%]", !isFirstRightColItem ? 'mt-10': 'mt-0')}>
-                            <MenuCard item={item as MenuItem} />
-                        </View>
-                    )
-                }}
-                keyExtractor={item => item.$id}
-                numColumns={2}
-                columnWrapperClassName="gap-7"
-                contentContainerClassName="gap-7 px-5 pb-32"
-                ListHeaderComponent={() => (
-                    <View className="my-5 gap-5">
-                        <View className="flex-between flex-row w-full">
-                            <View className="flex-start">
-                                <Text className="small-bold uppercase text-primary">Search</Text>
-                                <View className="flex-start flex-row gap-x-1 mt-0.5">
-                                    <Text className="paragraph-semibold text-dark-100">Find your favorite food</Text>
-                                </View>
-                            </View>
-
-                            <CartButton />
-                        </View>
-
-                        <SearchBar />
-
-                        <Filter categories={categories!} />
-                    </View>
-                )}
-                ListEmptyComponent={() => !loading && <Text>No results</Text>}
+  return (
+    <View className="flex-1 bg-white p-4">
+      <Text className="text-2xl font-bold mb-4">Available Packs</Text>
+      <FlatList
+        data={packs}
+        keyExtractor={(item) => item.$id}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 16 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            className="flex-1 bg-gray-100 rounded-xl p-3 mx-1"
+            onPress={() => router.push(`/packs/${item.$id}`)}
+          >
+            <Image
+              source={{ uri: item.image_url }}
+              resizeMode="cover"
+              className="w-full h-32 rounded-lg mb-2"
             />
-        </SafeAreaView>
-    )
+            <Text className="font-semibold">{item.name}</Text>
+            <Text className="text-gray-600">€{item.price.toFixed(2)}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
 }
-
-export default Search

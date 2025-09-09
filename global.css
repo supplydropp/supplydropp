@@ -1,0 +1,2 @@
+/* global.css (root) */
+@import "./app/styles.css";  /* <-- read step 3 */
