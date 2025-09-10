@@ -31,7 +31,7 @@ import cucumber from "@/assets/images/cucumber.png";
 import emptyState from "@/assets/images/empty-state.png";
 import fries from "@/assets/images/fries.png";
 import loginGraphic from "@/assets/images/login-graphic.png";
-import logo from "@/assets/images/logo.png";
+import logo from "@/assets/images/supplydropp-logo-stocked.png";
 import mozarellaSticks from "@/assets/images/mozarella-sticks.png";
 import mushrooms from "@/assets/images/mushrooms.png";
 import onionRings from "@/assets/images/onion-rings.png";
@@ -40,6 +40,7 @@ import pizzaOne from "@/assets/images/pizza-one.png";
 import salad from "@/assets/images/salad.png";
 import success from "@/assets/images/success.png";
 import tomatoes from "@/assets/images/tomatoes.png";
+import emptyCart from "@/assets/images/cart-empty.png";
 
 export const CATEGORIES = [
     {
@@ -199,4 +200,5 @@ export const images = {
     star,
     trash,
     user,
+    emptyCart,
 };

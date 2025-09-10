@@ -10,49 +10,31 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { databases, appwriteConfig } from "@/lib/appwrite";
-import { Query } from "react-native-appwrite";
 import useAuthStore from "@/store/auth.store";
 import { useCartStore } from "@/store/cart.store";
 import CartModal from "@/components/cart/CartModal"; // ✅ new modal
 
-export default function PackDetail() {
-  const { id } = useLocalSearchParams(); // pack id
+export default function ProductDetail() {
+  const { id } = useLocalSearchParams(); // product id
   const router = useRouter();
   const { user } = useAuthStore();
   const addItem = useCartStore((s) => s.addItem);
 
-  const [pack, setPack] = useState<any>(null);
-  const [products, setProducts] = useState<Record<string, any>>({});
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  // Load pack + related products
   useEffect(() => {
     async function load() {
       try {
-        const packRes = await databases.getDocument(
+        const prodRes = await databases.getDocument(
           appwriteConfig.databaseId,
-          appwriteConfig.packsCollectionId,
+          appwriteConfig.productsCollectionId,
           id as string
         );
-        setPack(packRes);
-
-        if (packRes.items && packRes.items.length > 0) {
-          const productIds = packRes.items.map((i: any) => i.productId);
-          const prodRes = await databases.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.productsCollectionId,
-            [Query.equal("$id", productIds)]
-          );
-
-          const prodMap: Record<string, any> = {};
-          prodRes.documents.forEach((p: any) => {
-            prodMap[p.$id] = p;
-          });
-          setProducts(prodMap);
-        }
+        setProduct(prodRes);
       } catch (err) {
-        console.error("Failed to load pack:", err);
+        console.error("Failed to load product:", err);
       } finally {
         setLoading(false);
       }
@@ -68,10 +50,10 @@ export default function PackDetail() {
     }
 
     addItem({
-      id: pack.$id,
-      name: pack.name,
-      price: pack.price,
-      image_url: pack.image_url,
+      id: product.$id,
+      name: product.name,
+      price: product.cost_price,
+      image_url: product.image_url,
       customizations: [],
     });
     setShowModal(true);
@@ -85,10 +67,10 @@ export default function PackDetail() {
     );
   }
 
-  if (!pack) {
+  if (!product) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Text>Pack not found.</Text>
+        <Text>Product not found.</Text>
       </View>
     );
   }
@@ -97,31 +79,17 @@ export default function PackDetail() {
     <>
       <ScrollView className="flex-1 bg-white">
         <Image
-          source={{ uri: pack.image_url }}
+          source={{ uri: product.image_url }}
           className="w-full h-60"
           resizeMode="cover"
         />
 
         <View className="p-5">
-          <Text className="text-2xl font-bold mb-2">{pack.name}</Text>
+          <Text className="text-2xl font-bold mb-2">{product.name}</Text>
           <Text className="text-lg text-gray-600 mb-4">
-            €{pack.price.toFixed(2)}
+            €{product.cost_price.toFixed(2)}
           </Text>
-          <Text className="mb-4">{pack.description}</Text>
-
-          {pack.items && pack.items.length > 0 && (
-            <View className="mb-5">
-              <Text className="text-xl font-semibold mb-2">Included Items:</Text>
-              {pack.items.map((i: any, idx: number) => {
-                const product = products[i.productId];
-                return (
-                  <Text key={idx} className="text-gray-700">
-                    • {i.quantity} × {product ? product.name : "Unknown item"}
-                  </Text>
-                );
-              })}
-            </View>
-          )}
+          <Text className="mb-4">{product.description}</Text>
 
           {/* 🔹 Add to Cart button */}
           <TouchableOpacity

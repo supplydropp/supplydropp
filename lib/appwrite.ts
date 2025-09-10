@@ -24,7 +24,7 @@ export const appwriteConfig = {
   platform: 'com.supplydropp.provisioning',
 
   databaseId: '68bce2d600248f0e80dc',
-  bucketId: '68643e170015edaa95d7',
+  bucketId: "68c006420014eaa23432",
 
   
   userCollectionId: 'user',

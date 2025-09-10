@@ -1,4 +1,3 @@
-// lib/seeder.ts
 import { databases, appwriteConfig } from "@/lib/appwrite";
 
 export async function runSeeder() {
@@ -72,12 +71,16 @@ export async function runSeeder() {
 
   await databases.createDocument(appwriteConfig.databaseId, appwriteConfig.packItemsCollectionId, "unique()", {
     packId: [breakfastPack.$id],
+    packIdStr: breakfastPack.$id,
     productId: [milk.$id],
+    productIdStr: milk.$id,
     quantity: 1,
   });
   await databases.createDocument(appwriteConfig.databaseId, appwriteConfig.packItemsCollectionId, "unique()", {
     packId: [breakfastPack.$id],
+    packIdStr: breakfastPack.$id,
     productId: [bread.$id],
+    productIdStr: bread.$id,
     quantity: 1,
   });
 
@@ -98,12 +101,16 @@ export async function runSeeder() {
 
   await databases.createDocument(appwriteConfig.databaseId, appwriteConfig.packItemsCollectionId, "unique()", {
     packId: [tapasPack.$id],
+    packIdStr: tapasPack.$id,
     productId: [wine.$id],
+    productIdStr: wine.$id,
     quantity: 1,
   });
   await databases.createDocument(appwriteConfig.databaseId, appwriteConfig.packItemsCollectionId, "unique()", {
     packId: [tapasPack.$id],
+    packIdStr: tapasPack.$id,
     productId: [cheese.$id],
+    productIdStr: cheese.$id,
     quantity: 1,
   });
 
@@ -126,7 +133,9 @@ export async function runSeeder() {
   for (const product of [cleaner, toiletPaper, shampoo]) {
     await databases.createDocument(appwriteConfig.databaseId, appwriteConfig.packItemsCollectionId, "unique()", {
       packId: [cleaningPack.$id],
+      packIdStr: cleaningPack.$id,
       productId: [product.$id],
+      productIdStr: product.$id,
       quantity: 1,
     });
   }
@@ -149,7 +158,9 @@ export async function runSeeder() {
   for (const product of [cleaner, toiletPaper, shampoo, milk, bread]) {
     await databases.createDocument(appwriteConfig.databaseId, appwriteConfig.packItemsCollectionId, "unique()", {
       packId: [turnoverPack.$id],
+      packIdStr: turnoverPack.$id,
       productId: [product.$id],
+      productIdStr: product.$id,
       quantity: 1,
     });
   }

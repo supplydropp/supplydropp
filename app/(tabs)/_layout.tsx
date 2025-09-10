@@ -81,7 +81,7 @@ export default function TabLayout() {
 
       {/* Store (was Search) */}
       <Tabs.Screen
-        name="search"
+        name="store"
         options={{
           title: "Store",
           tabBarIcon: ({ focused }) => (
@@ -92,7 +92,7 @@ export default function TabLayout() {
 
       {/* Orders (was Cart) */}
       <Tabs.Screen
-        name="cart"
+        name="orders"
         options={{
           title: "Orders",
           tabBarIcon: ({ focused }) => (
